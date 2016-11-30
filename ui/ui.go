@@ -6,16 +6,16 @@ import (
 )
 
 type UI struct {
-	entries parser.Entries
-	pointer int
-	gui     *gocui.Gui
-	views   []*ViewManager
+	entries      parser.Entries
+	pointer      int
+	gui          *gocui.Gui
+	viewManagers []*ViewManager
 }
 
 func New(entries parser.Entries) *UI {
 	return &UI{
-		entries: entries,
-		views:   []*ViewManager{},
+		entries:      entries,
+		viewManagers: []*ViewManager{},
 	}
 }
 
@@ -30,9 +30,7 @@ func (ui *UI) Start() error {
 	ui.gui.SelFgColor = gocui.ColorBlack
 
 	ui.gui.SetManagerFunc(ui.render)
-
 	ui.renderEntries(ui.gui, ui.entries, nil)
-	ui.gui.SetCurrentView("entries-0")
 
 	if err := ui.gui.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, ui.quit); err != nil {
 		return err
@@ -51,10 +49,6 @@ func (ui *UI) quit(g *gocui.Gui, v *gocui.View) error {
 func (ui *UI) render(g *gocui.Gui) error {
 	return nil
 }
-
-// func (ui *UI) addView(g *gocui.Gui) error {
-// 	return ui.renderEntries(g, ui.zoom.Children, ui.zoom)
-// }
 
 func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser.Entry) error {
 	maxX, maxY := g.Size()
@@ -78,13 +72,12 @@ func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser
 		return err
 	}
 
-	ui.views = append(ui.views, viewManager)
-	_, err = g.SetCurrentView(viewName)
-	return err
+	ui.viewManagers = append(ui.viewManagers, viewManager)
+	return viewManager.SetCurrent()
 }
 
 func (ui *UI) zoomIn(g *gocui.Gui, v *gocui.View) error {
-	topViewManager := ui.views[len(ui.views)-1]
+	topViewManager := ui.viewManagers[len(ui.viewManagers)-1]
 	selEntry := topViewManager.SelectedEntry()
 
 	if len(selEntry.Children) == 0 {
@@ -95,19 +88,19 @@ func (ui *UI) zoomIn(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (ui *UI) zoomOut(g *gocui.Gui, v *gocui.View) error {
-	if len(ui.views) <= 1 {
+	if len(ui.viewManagers) <= 1 {
 		return nil
 	}
 
-	totalViews := len(ui.views)
-	topViewManager := ui.views[totalViews-1]
+	totalViews := len(ui.viewManagers)
+	topViewManager := ui.viewManagers[totalViews-1]
 
 	if err := g.DeleteView(topViewManager.Name()); err != nil {
 		return err
 	}
 
-	ui.views = ui.views[:totalViews-1]
-	if _, err := g.SetCurrentView(ui.views[totalViews-2].Name()); err != nil {
+	ui.viewManagers = ui.viewManagers[:totalViews-1]
+	if err := ui.viewManagers[totalViews-2].SetCurrent(); err != nil {
 		return err
 	}
 

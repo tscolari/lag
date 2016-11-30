@@ -59,6 +59,11 @@ func (vm *ViewManager) SelectedEntry() *parser.Entry {
 	return vm.contents[vm.pointer]
 }
 
+func (vm *ViewManager) SetCurrent() error {
+	_, err := vm.gui.SetCurrentView(vm.id)
+	return err
+}
+
 func (vm *ViewManager) Name() string {
 	return vm.id
 }

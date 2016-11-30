@@ -95,7 +95,7 @@ func (ui *UI) zoomOut(g *gocui.Gui, v *gocui.View) error {
 	totalViews := len(ui.viewManagers)
 	topViewManager := ui.viewManagers[totalViews-1]
 
-	if err := g.DeleteView(topViewManager.Name()); err != nil {
+	if err := topViewManager.RemoveView(); err != nil {
 		return err
 	}
 

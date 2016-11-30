@@ -68,6 +68,10 @@ func (vm *ViewManager) Name() string {
 	return vm.id
 }
 
+func (vm *ViewManager) RemoveView() error {
+	return vm.gui.DeleteView(vm.id)
+}
+
 func (vm *ViewManager) moveUp(g *gocui.Gui, v *gocui.View) error {
 	if vm.pointer > 0 {
 		vm.pointer--
@@ -94,8 +98,6 @@ func (vm *ViewManager) moveDown(g *gocui.Gui, v *gocui.View) error {
 	if vm.view != nil {
 		cx, cy := vm.view.Cursor()
 		ox, oy := vm.view.Origin()
-		//  ok,  := movm.viewable(vm.view, oy+cy+1)
-		//  _, maxY := vm.view.Size()
 		if err := vm.view.SetCursor(cx, cy+1); err != nil {
 			if err := vm.view.SetOrigin(ox, oy+1); err != nil {
 				return err

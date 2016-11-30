@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/tscolari/lag/parser"
 	"github.com/tscolari/lag/ui"
@@ -29,4 +31,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to start UI: %s\n", err.Error())
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }

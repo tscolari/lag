@@ -15,6 +15,11 @@ type ViewManager struct {
 	pointer  int
 	title    string
 	view     *gocui.View
+	size     size
+}
+
+type size struct {
+	startX, startY, endX, endY int
 }
 
 func NewViewManager(g *gocui.Gui, title string, contents parser.Entries) *ViewManager {
@@ -32,13 +37,13 @@ func (vm *ViewManager) View(startX, startY, endX, endY int) (*gocui.View, error)
 		return vm.view, nil
 	}
 
-	if v, err := vm.gui.SetView(vm.id, startX, startY, endX, endY); err != nil {
+	if v, err := vm.gui.SetView(vm.id, startX, startY, endX, 2*endY/3); err != nil {
 		if err != gocui.ErrUnknownView {
 			return nil, err
 		}
 
+		vm.size = size{startX, startY, endX, endY}
 		v.Highlight = true
-
 		if err := vm.gui.SetKeybinding(vm.id, gocui.KeyArrowDown, gocui.ModNone, vm.moveDown); err != nil {
 			return nil, err
 		}
@@ -50,6 +55,8 @@ func (vm *ViewManager) View(startX, startY, endX, endY int) (*gocui.View, error)
 		v.Title = vm.title
 		printEntries(v, vm.contents)
 		vm.view = v
+
+		vm.updateInfoView(vm.contents[0])
 	}
 
 	return vm.view, nil
@@ -72,6 +79,24 @@ func (vm *ViewManager) RemoveView() error {
 	return vm.gui.DeleteView(vm.id)
 }
 
+func (vm *ViewManager) updateInfoView(entry *parser.Entry) error {
+	viewName := fmt.Sprintf("%s-info", vm.id)
+
+	vm.gui.DeleteView(viewName)
+	if v, err := vm.gui.SetView(viewName, vm.size.startX, 2*vm.size.endY/3+1, vm.size.endX, vm.size.endY); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+
+		v.Title = "details"
+		for key, value := range entry.Data.Data {
+			fmt.Fprintf(v, "%10s: %v\n", key, value)
+		}
+	}
+
+	return nil
+}
+
 func (vm *ViewManager) moveUp(g *gocui.Gui, v *gocui.View) error {
 	if vm.pointer > 0 {
 		vm.pointer--
@@ -87,7 +112,7 @@ func (vm *ViewManager) moveUp(g *gocui.Gui, v *gocui.View) error {
 		}
 	}
 
-	return nil
+	return vm.updateInfoView(vm.contents[vm.pointer])
 }
 
 func (vm *ViewManager) moveDown(g *gocui.Gui, v *gocui.View) error {
@@ -105,5 +130,5 @@ func (vm *ViewManager) moveDown(g *gocui.Gui, v *gocui.View) error {
 		}
 	}
 
-	return nil
+	return vm.updateInfoView(vm.contents[vm.pointer])
 }

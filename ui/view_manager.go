@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/jroimartin/gocui"
 	"github.com/tscolari/lag/parser"
@@ -53,6 +54,7 @@ func (vm *ViewManager) View(startX, startY, endX, endY int) (*gocui.View, error)
 		}
 
 		v.Title = vm.title
+		v.BgColor = gocui.ColorBlack
 		printEntries(v, vm.contents)
 		vm.view = v
 
@@ -89,8 +91,15 @@ func (vm *ViewManager) updateInfoView(entry *parser.Entry) error {
 		}
 
 		v.Title = "details"
-		for key, value := range entry.Data.Data {
-			fmt.Fprintf(v, "%10s: %v\n", key, value)
+		if entry != nil {
+			fmt.Fprintf(v, "  %s\n", logLevelToString(entry.Data.LogLevel))
+			fmt.Fprintf(v, "  %s\n", entry.Data.Message)
+			fmt.Fprintf(v, "  %s\n", entry.Data.Timestamp.Format(time.RFC3339))
+			fmt.Fprintln(v, "--------------------------------------------------------")
+
+			for key, value := range entry.Data.Data {
+				fmt.Fprintf(v, "%10s: %v\n", key, value)
+			}
 		}
 	}
 
@@ -98,10 +107,11 @@ func (vm *ViewManager) updateInfoView(entry *parser.Entry) error {
 }
 
 func (vm *ViewManager) moveUp(g *gocui.Gui, v *gocui.View) error {
-	if vm.pointer > 0 {
-		vm.pointer--
+	if vm.pointer <= 0 {
+		return nil
 	}
 
+	vm.pointer--
 	if vm.view != nil {
 		ox, oy := vm.view.Origin()
 		cx, cy := vm.view.Cursor()
@@ -116,10 +126,11 @@ func (vm *ViewManager) moveUp(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (vm *ViewManager) moveDown(g *gocui.Gui, v *gocui.View) error {
-	if len(vm.contents) > vm.pointer {
-		vm.pointer++
+	if vm.pointer >= len(vm.contents)-1 {
+		return nil
 	}
 
+	vm.pointer++
 	if vm.view != nil {
 		cx, cy := vm.view.Cursor()
 		ox, oy := vm.view.Origin()

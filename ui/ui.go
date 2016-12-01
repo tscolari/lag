@@ -26,6 +26,7 @@ func (ui *UI) Start() error {
 		return err
 	}
 	defer ui.gui.Close()
+	ui.gui.BgColor = gocui.ColorBlack
 	ui.gui.SelBgColor = gocui.ColorGreen
 	ui.gui.SelFgColor = gocui.ColorBlack
 

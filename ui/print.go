@@ -23,7 +23,8 @@ func printEntryHeader(v *gocui.View, entry *parser.Entry) {
 		message = redText(entry.Data.Message)
 	}
 
-	fmt.Fprintf(v, "%s [%s] (%d) %s \n",
+	fmt.Fprintf(v, "%s %s [%s] (%d) %s \n",
+		logLevelToString(entry.Data.LogLevel),
 		blueText(date),
 		yellowText(entry.Data.Session),
 		len(entry.Children),
@@ -48,13 +49,13 @@ func printEntryInfo(v *gocui.View, entry *parser.Entry) {
 func logLevelToString(logLevel lager.LogLevel) string {
 	switch logLevel {
 	case lager.DEBUG:
-		return "DEBUG"
+		return whiteInMagentaText(" DEBUG ")
 	case lager.INFO:
-		return "INFO"
+		return whiteInBlueText("  INFO ")
 	case lager.FATAL:
-		return redText("FATAL")
+		return whiteInRedText(" FATAL ")
 	case lager.ERROR:
-		return redText("ERROR")
+		return whiteInRedText(" ERROR ")
 	default:
 		return "Unknown"
 	}

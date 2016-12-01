@@ -24,7 +24,7 @@ func Parse(data io.Reader) (Entries, error) {
 			Errored:  (entry.Log.LogLevel == lager.ERROR),
 		}
 
-		if !AppendEntry(entries, newEntry) {
+		if !appendEntry(entries, newEntry) {
 			entries = append(entries, &newEntry)
 		}
 	}
@@ -32,19 +32,20 @@ func Parse(data io.Reader) (Entries, error) {
 	return entries, nil
 }
 
-func AppendEntry(entries Entries, newEntry Entry) bool {
+func appendEntry(entries Entries, newEntry Entry) bool {
 	for _, entry := range entries {
 		if newEntry.Data.Session == entry.Data.Session {
 			return false
 		}
 
 		if strings.HasPrefix(newEntry.Data.Session, entry.Data.Session) {
-			if ok := AppendEntry(entry.Children, newEntry); ok {
+			if ok := appendEntry(entry.Children, newEntry); ok {
 				return true
 			} else {
 				newEntry.Parent = entry
 				if newEntry.Errored {
-					setErroredState(newEntry.Parent)
+					newEntry.Errored = true
+					propagateErroredState(&newEntry)
 				}
 
 				entry.Children = append(entry.Children, &newEntry)
@@ -56,11 +57,8 @@ func AppendEntry(entries Entries, newEntry Entry) bool {
 	return false
 }
 
-func setErroredState(entry *Entry) {
-	if entry == nil {
-		return
+func propagateErroredState(entry *Entry) {
+	for entry := entry.Parent; entry != nil; entry = entry.Parent {
+		entry.Errored = true
 	}
-
-	entry.Errored = true
-	setErroredState(entry.Parent)
 }

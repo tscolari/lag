@@ -3,7 +3,6 @@ package ui
 import (
 	"fmt"
 	"math/rand"
-	"time"
 
 	"github.com/jroimartin/gocui"
 	"github.com/tscolari/lag/parser"
@@ -83,26 +82,20 @@ func (vm *ViewManager) RemoveView() error {
 
 func (vm *ViewManager) updateInfoView(entry *parser.Entry) error {
 	viewName := fmt.Sprintf("%s-info", vm.id)
-
 	vm.gui.DeleteView(viewName)
+
+	if entry == nil {
+		return nil
+	}
+
 	if v, err := vm.gui.SetView(viewName, vm.size.startX, 2*vm.size.endY/3+1, vm.size.endX, vm.size.endY); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 
 		v.Title = "details"
-		if entry != nil {
-			fmt.Fprintf(v, "  %s\n", logLevelToString(entry.Data.LogLevel))
-			fmt.Fprintf(v, "  %s\n", entry.Data.Message)
-			fmt.Fprintf(v, "  %s\n", entry.Data.Timestamp.Format(time.RFC3339))
-			fmt.Fprintln(v, "--------------------------------------------------------")
-
-			for key, value := range entry.Data.Data {
-				fmt.Fprintf(v, "%10s: %v\n", key, value)
-			}
-		}
+		printEntryInfo(v, entry)
 	}
-
 	return nil
 }
 

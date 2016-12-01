@@ -1,15 +1,15 @@
 package ui
 
-import "fmt"
+import "github.com/fatih/color"
 
 func redText(text string) string {
-	return fmt.Sprintf("\x1b[0;31m%s\x1b", text)
+	return color.New(color.FgRed).SprintFunc()(text)
 }
 
 func blueText(text string) string {
-	return fmt.Sprintf("\x1b[0;34m%s\x1b", text)
+	return color.New(color.FgBlue).SprintFunc()(text)
 }
 
 func yellowText(text string) string {
-	return fmt.Sprintf("\x1b[0;33m%s\x1b", text)
+	return color.New(color.FgYellow).SprintFunc()(text)
 }

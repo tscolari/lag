@@ -18,3 +18,4 @@
 * `enter` zooms into the selected entry
 * `q` zooms out from the selected entry
 * `backspace` zooms out from the selected entry
+* `e` filters for errored logs only (`q` to zoom out)

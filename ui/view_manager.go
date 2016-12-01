@@ -72,6 +72,10 @@ func (vm *ViewManager) SetCurrent() error {
 	return err
 }
 
+func (vm *ViewManager) Contents() parser.Entries {
+	return vm.contents
+}
+
 func (vm *ViewManager) Name() string {
 	return vm.id
 }

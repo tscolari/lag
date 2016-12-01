@@ -8,15 +8,6 @@ import (
 	"code.cloudfoundry.org/lager/chug"
 )
 
-type Entries []*Entry
-
-type Entry struct {
-	Data     chug.LogEntry
-	Children []*Entry
-	Parent   *Entry
-	Errored  bool
-}
-
 func Parse(data io.Reader) (Entries, error) {
 	entries := Entries{}
 	lagerEntries := make(chan chug.Entry)

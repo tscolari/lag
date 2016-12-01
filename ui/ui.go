@@ -85,6 +85,10 @@ func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser
 		return err
 	}
 
+	if err := g.SetKeybinding(viewName, 'e', gocui.ModNone, ui.filterErrored); err != nil {
+		return err
+	}
+
 	ui.viewManagers = append(ui.viewManagers, viewManager)
 	return viewManager.SetCurrent()
 }
@@ -118,4 +122,16 @@ func (ui *UI) zoomOut(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	return nil
+}
+
+func (ui *UI) filterErrored(g *gocui.Gui, v *gocui.View) error {
+	topViewManager := ui.viewManagers[len(ui.viewManagers)-1]
+	currentContents := topViewManager.Contents()
+	erroredEntries := currentContents.ErroredOnly()
+
+	if len(erroredEntries) == 0 {
+		return nil
+	}
+
+	return ui.renderEntries(g, erroredEntries, nil)
 }

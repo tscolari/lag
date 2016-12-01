@@ -37,6 +37,10 @@ func (ui *UI) Start() error {
 		return err
 	}
 
+	if err := ui.gui.SetKeybinding("", 'Q', gocui.ModNone, ui.quit); err != nil {
+		return err
+	}
+
 	if err := ui.gui.MainLoop(); err != nil && err != gocui.ErrQuit {
 		return err
 	}
@@ -69,7 +73,15 @@ func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser
 		return err
 	}
 
-	if err := g.SetKeybinding(viewName, gocui.KeyArrowLeft, gocui.ModNone, ui.zoomOut); err != nil {
+	if err := g.SetKeybinding(viewName, gocui.KeyBackspace2, gocui.ModNone, ui.zoomOut); err != nil {
+		return err
+	}
+
+	if err := g.SetKeybinding(viewName, gocui.KeyBackspace, gocui.ModNone, ui.zoomOut); err != nil {
+		return err
+	}
+
+	if err := g.SetKeybinding(viewName, 'q', gocui.ModNone, ui.zoomOut); err != nil {
 		return err
 	}
 

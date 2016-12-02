@@ -76,6 +76,41 @@ var _ = Describe("Parse", func() {
 			Expect(entries[0].Children[0].Children[4].Data.Message).To(Equal("guardian.run.exec.execrunner.runc-exit-status"))
 			Expect(entries[0].Children[0].Children[5].Data.Message).To(Equal("guardian.run.exec.execrunner.done"))
 		})
+
+		Context("complex nesting", func() {
+			BeforeEach(func() {
+				rawData = []byte(`
+											{"timestamp":"1476218925.979571342","source":"g","message":"a","log_level":1,"data":{"session":"1"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab1","log_level":1,"data":{"session":"1.1"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab2","log_level":1,"data":{"session":"1.1"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab2c1","log_level":1,"data":{"session":"1.1.2"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab3","log_level":1,"data":{"session":"1.1"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab3c1","log_level":1,"data":{"session":"1.1.2"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab3c2","log_level":1,"data":{"session":"1.1.2"}}
+											`)
+			})
+
+			It("deals with it", func() {
+				entries, err := parser.Parse(rawDataStream)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(entries)).To(Equal(1))
+				Expect(entries[0].Data.Message).To(Equal("a"))
+
+				Expect(len(entries[0].Children)).To(Equal(3))
+				Expect(entries[0].Children[0].Data.Message).To(Equal("ab1"))
+				Expect(entries[0].Children[1].Data.Message).To(Equal("ab2"))
+				Expect(entries[0].Children[2].Data.Message).To(Equal("ab3"))
+
+				Expect(len(entries[0].Children[0].Children)).To(Equal(0))
+
+				Expect(len(entries[0].Children[1].Children)).To(Equal(1))
+				Expect(entries[0].Children[1].Children[0].Data.Message).To(Equal("ab2c1"))
+
+				Expect(len(entries[0].Children[2].Children)).To(Equal(2))
+				Expect(entries[0].Children[2].Children[0].Data.Message).To(Equal("ab3c1"))
+				Expect(entries[0].Children[2].Children[1].Data.Message).To(Equal("ab3c2"))
+			})
+		})
 	})
 
 	Context("when it's an error log", func() {

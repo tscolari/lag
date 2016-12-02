@@ -33,7 +33,8 @@ func Parse(data io.Reader) (Entries, error) {
 }
 
 func appendEntry(entries Entries, newEntry Entry) bool {
-	for _, entry := range entries {
+	for i := len(entries) - 1; i >= 0; i-- {
+		entry := entries[i]
 		if newEntry.Data.Session == entry.Data.Session {
 			return false
 		}

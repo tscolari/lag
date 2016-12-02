@@ -19,3 +19,7 @@
 * `q` zooms out from the selected entry
 * `backspace` zooms out from the selected entry
 * `e` filters for errored logs only (`q` to zoom out)
+
+## Demo
+
+[![DEMO](http://img.youtube.com/vi/qBADTLlGMOQ/0.jpg)](http://www.youtube.com/watch?v=qBADTLlGMOQ "lag demo")

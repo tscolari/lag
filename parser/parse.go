@@ -35,8 +35,12 @@ func Parse(data io.Reader) (Entries, error) {
 func appendEntry(entries Entries, newEntry Entry) bool {
 	for i := len(entries) - 1; i >= 0; i-- {
 		entry := entries[i]
+		if entry.Data.Source != newEntry.Data.Source {
+			continue
+		}
+
 		if newEntry.Data.Session == entry.Data.Session {
-			return false
+			continue
 		}
 
 		if strings.HasPrefix(newEntry.Data.Session, entry.Data.Session) {

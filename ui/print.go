@@ -34,6 +34,7 @@ func printEntryHeader(v *gocui.View, entry *parser.Entry) {
 func printEntryInfo(v *gocui.View, entry *parser.Entry) {
 	fmt.Fprintln(v, " ")
 	fmt.Fprintf(v, "  %s\n", logLevelToString(entry.Data.LogLevel))
+	fmt.Fprintf(v, "  %s: %s\n", yellowText("Source"), entry.Data.Source)
 	fmt.Fprintf(v, "  %s: %s\n", yellowText("Message"), entry.Data.Message)
 	fmt.Fprintf(v, "  %s: %s\n", yellowText("Time"), blueText(entry.Data.Timestamp.Format(time.RFC3339)))
 	if entry.Data.Error != nil {

@@ -48,7 +48,15 @@ func (vm *ViewManager) View(startX, startY, endX, endY int) (*gocui.View, error)
 			return nil, err
 		}
 
+		if err := vm.gui.SetKeybinding(vm.id, gocui.KeyPgdn, gocui.ModNone, vm.movePageDown); err != nil {
+			return nil, err
+		}
+
 		if err := vm.gui.SetKeybinding(vm.id, gocui.KeyArrowUp, gocui.ModNone, vm.moveUp); err != nil {
+			return nil, err
+		}
+
+		if err := vm.gui.SetKeybinding(vm.id, gocui.KeyPgup, gocui.ModNone, vm.movePageUp); err != nil {
 			return nil, err
 		}
 
@@ -139,4 +147,28 @@ func (vm *ViewManager) moveDown(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	return vm.updateInfoView(vm.contents[vm.pointer])
+}
+
+func (vm *ViewManager) movePageUp(g *gocui.Gui, v *gocui.View) error {
+	_, y := g.CurrentView().Size()
+
+	for i := 0; i < y; i++ {
+		if err := vm.moveUp(g, v); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (vm *ViewManager) movePageDown(g *gocui.Gui, v *gocui.View) error {
+	_, y := g.CurrentView().Size()
+
+	for i := 0; i < y; i++ {
+		if err := vm.moveDown(g, v); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

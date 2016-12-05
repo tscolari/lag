@@ -16,8 +16,8 @@
 ## Navigation:
 
 * `Q` exits
-* `arrow up` moves cursor up
-* `arrow down` moves cursor down
+* `arrow up/down` moves cursor up/down
+* `page up/down` moves page up/down
 * `enter` zooms into the selected entry
 * `q` zooms out from the selected entry
 * `backspace` zooms out from the selected entry

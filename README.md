@@ -1,3 +1,6 @@
+
+![lag](https://raw.githubusercontent.com/tscolari/lag/master/example.gif)
+
 ## Install:
 
 ```

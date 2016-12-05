@@ -83,6 +83,7 @@ var _ = Describe("Parse", func() {
 											{"timestamp":"1476218925.979571342","source":"g","message":"a","log_level":1,"data":{"session":"1"}}
 											{"timestamp":"1476218925.979571342","source":"g","message":"ab1","log_level":1,"data":{"session":"1.1"}}
 											{"timestamp":"1476218925.979571342","source":"g","message":"ab2","log_level":1,"data":{"session":"1.1"}}
+											{"timestamp":"1476218925.979571342","source":"g","message":"ab10","log_level":1,"data":{"session":"1.10"}}
 											{"timestamp":"1476218925.979571342","source":"g","message":"ab2c1","log_level":1,"data":{"session":"1.1.2"}}
 											{"timestamp":"1476218925.979571342","source":"g","message":"ab3","log_level":1,"data":{"session":"1.1"}}
 											{"timestamp":"1476218925.979571342","source":"g","message":"ab3c1","log_level":1,"data":{"session":"1.1.2"}}
@@ -96,19 +97,22 @@ var _ = Describe("Parse", func() {
 				Expect(len(entries)).To(Equal(1))
 				Expect(entries[0].Data.Message).To(Equal("a"))
 
-				Expect(len(entries[0].Children)).To(Equal(3))
+				Expect(len(entries[0].Children)).To(Equal(4))
 				Expect(entries[0].Children[0].Data.Message).To(Equal("ab1"))
 				Expect(entries[0].Children[1].Data.Message).To(Equal("ab2"))
-				Expect(entries[0].Children[2].Data.Message).To(Equal("ab3"))
+				Expect(entries[0].Children[2].Data.Message).To(Equal("ab10"))
+				Expect(entries[0].Children[3].Data.Message).To(Equal("ab3"))
 
 				Expect(len(entries[0].Children[0].Children)).To(Equal(0))
 
 				Expect(len(entries[0].Children[1].Children)).To(Equal(1))
 				Expect(entries[0].Children[1].Children[0].Data.Message).To(Equal("ab2c1"))
 
-				Expect(len(entries[0].Children[2].Children)).To(Equal(2))
-				Expect(entries[0].Children[2].Children[0].Data.Message).To(Equal("ab3c1"))
-				Expect(entries[0].Children[2].Children[1].Data.Message).To(Equal("ab3c2"))
+				Expect(len(entries[0].Children[2].Children)).To(Equal(0))
+
+				Expect(len(entries[0].Children[3].Children)).To(Equal(2))
+				Expect(entries[0].Children[3].Children[0].Data.Message).To(Equal("ab3c1"))
+				Expect(entries[0].Children[3].Children[1].Data.Message).To(Equal("ab3c2"))
 			})
 		})
 

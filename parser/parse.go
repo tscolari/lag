@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
@@ -43,7 +44,7 @@ func appendEntry(entries Entries, newEntry Entry) bool {
 			continue
 		}
 
-		if strings.HasPrefix(newEntry.Data.Session, entry.Data.Session) {
+		if strings.HasPrefix(newEntry.Data.Session, fmt.Sprintf("%s.", entry.Data.Session)) {
 			if ok := appendEntry(entry.Children, newEntry); ok {
 				return true
 			} else {

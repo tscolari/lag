@@ -17,9 +17,12 @@
 
 * `Q` exits
 * `arrow up/down` moves cursor up/down
+* `k/j` moves cursor up/down (vim)
 * `page up/down` moves page up/down
 * `enter` zooms into the selected entry
+* `l` zooms into the selected entry (vim)
 * `q` zooms out from the selected entry
+* `h` zooms out from the selected entry (vim)
 * `backspace` zooms out from the selected entry
 * `e` filters for errored logs only (`q` to zoom out)
 

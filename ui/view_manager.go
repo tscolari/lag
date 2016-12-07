@@ -44,7 +44,8 @@ func (vm *ViewManager) View(startX, startY, endX, endY int) (*gocui.View, error)
 
 		vm.size = size{startX, startY, endX, endY}
 		v.Highlight = true
-		if err := vm.gui.SetKeybinding(vm.id, gocui.KeyArrowDown, gocui.ModNone, vm.moveDown); err != nil {
+
+		if err := setKeysbindings(vm.gui, vm.id, navigateDownKeys, gocui.ModNone, vm.moveDown); err != nil {
 			return nil, err
 		}
 
@@ -52,7 +53,7 @@ func (vm *ViewManager) View(startX, startY, endX, endY int) (*gocui.View, error)
 			return nil, err
 		}
 
-		if err := vm.gui.SetKeybinding(vm.id, gocui.KeyArrowUp, gocui.ModNone, vm.moveUp); err != nil {
+		if err := setKeysbindings(vm.gui, vm.id, navigateUpKeys, gocui.ModNone, vm.moveUp); err != nil {
 			return nil, err
 		}
 

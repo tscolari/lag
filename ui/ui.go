@@ -69,19 +69,12 @@ func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser
 	}
 
 	viewName := viewManager.Name()
-	if err := g.SetKeybinding(viewName, gocui.KeyEnter, gocui.ModNone, ui.zoomIn); err != nil {
+
+	if err := setKeysbindings(ui.gui, viewName, navigateZoomInKeys, gocui.ModNone, ui.zoomIn); err != nil {
 		return err
 	}
 
-	if err := g.SetKeybinding(viewName, gocui.KeyBackspace2, gocui.ModNone, ui.zoomOut); err != nil {
-		return err
-	}
-
-	if err := g.SetKeybinding(viewName, gocui.KeyBackspace, gocui.ModNone, ui.zoomOut); err != nil {
-		return err
-	}
-
-	if err := g.SetKeybinding(viewName, 'q', gocui.ModNone, ui.zoomOut); err != nil {
+	if err := setKeysbindings(ui.gui, viewName, navigateZoomOutKeys, gocui.ModNone, ui.zoomOut); err != nil {
 		return err
 	}
 

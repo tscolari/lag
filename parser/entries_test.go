@@ -8,9 +8,13 @@ import (
 )
 
 var _ = Describe("Entries", func() {
-	Describe("ErroredOnly", func() {
-		var entries parser.Entries
+	var entries parser.Entries
 
+	BeforeEach(func() {
+		entries = parser.Entries{}
+	})
+
+	Describe("ErroredOnly", func() {
 		BeforeEach(func() {
 			entries = parser.Entries{
 				&parser.Entry{Errored: true, Data: chug.LogEntry{Message: "1"}},
@@ -26,6 +30,26 @@ var _ = Describe("Entries", func() {
 
 			Expect(filteredEntries[0].Data.Message).To(Equal("1"))
 			Expect(filteredEntries[1].Data.Message).To(Equal("3"))
+		})
+	})
+
+	Describe("RemoveSimilar", func() {
+		BeforeEach(func() {
+			entries = parser.Entries{
+				&parser.Entry{Data: chug.LogEntry{Message: "Annoying log message"}},
+				&parser.Entry{Data: chug.LogEntry{Message: "Annoying log message"}},
+				&parser.Entry{Data: chug.LogEntry{Message: "Important log message"}},
+				&parser.Entry{Data: chug.LogEntry{Message: "Annoying log message"}},
+				&parser.Entry{Data: chug.LogEntry{Message: "Important log message"}},
+			}
+		})
+
+		It("removes entries with the same message from the list", func() {
+			filteredEntries := entries.RemoveSimilar(parser.Entry{Data: chug.LogEntry{Message: "Annoying log message"}})
+			Expect(len(filteredEntries)).To(Equal(2))
+
+			Expect(filteredEntries[0].Data.Message).To(Equal("Important log message"))
+			Expect(filteredEntries[1].Data.Message).To(Equal("Important log message"))
 		})
 	})
 })

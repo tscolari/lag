@@ -82,6 +82,10 @@ func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser
 		return err
 	}
 
+	if err := g.SetKeybinding(viewName, 'D', gocui.ModNone, ui.deleteSimilar); err != nil {
+		return err
+	}
+
 	ui.viewManagers = append(ui.viewManagers, viewManager)
 	return viewManager.SetCurrent()
 }
@@ -127,4 +131,16 @@ func (ui *UI) filterErrored(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	return ui.renderEntries(g, erroredEntries, nil)
+}
+
+func (ui *UI) deleteSimilar(g *gocui.Gui, v *gocui.View) error {
+	topViewManager := ui.viewManagers[len(ui.viewManagers)-1]
+	currentContents := topViewManager.Contents()
+	filteredContents := currentContents.RemoveSimilar(*topViewManager.SelectedEntry())
+
+	if len(filteredContents) == 0 {
+		return nil
+	}
+
+	return ui.renderEntries(g, filteredContents, nil)
 }

@@ -22,3 +22,15 @@ func (es *Entries) ErroredOnly() Entries {
 
 	return erroredEntries
 }
+
+func (es *Entries) RemoveSimilar(sampleEntry Entry) Entries {
+	filteredEntries := []*Entry{}
+
+	for _, entry := range *es {
+		if entry.Data.Message != sampleEntry.Data.Message {
+			filteredEntries = append(filteredEntries, entry)
+		}
+	}
+
+	return filteredEntries
+}

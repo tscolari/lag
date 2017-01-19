@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fmt"
+
 	"github.com/jroimartin/gocui"
 	"github.com/tscolari/lag/parser"
 )
@@ -9,13 +11,20 @@ type UI struct {
 	entries      parser.Entries
 	pointer      int
 	gui          *gocui.Gui
-	viewManagers []*ViewManager
+	viewManagers []View
+}
+
+type View interface {
+	SelectedEntry() *parser.Entry
+	RemoveView() error
+	SetCurrent() error
+	Contents() parser.Entries
 }
 
 func New(entries parser.Entries) *UI {
 	return &UI{
 		entries:      entries,
-		viewManagers: []*ViewManager{},
+		viewManagers: []View{},
 	}
 }
 
@@ -86,6 +95,10 @@ func (ui *UI) renderEntries(g *gocui.Gui, entries parser.Entries, parent *parser
 		return err
 	}
 
+	if err := g.SetKeybinding(viewName, 'i', gocui.ModNone, ui.sessionInfo); err != nil {
+		return err
+	}
+
 	ui.viewManagers = append(ui.viewManagers, viewManager)
 	return viewManager.SetCurrent()
 }
@@ -143,4 +156,33 @@ func (ui *UI) deleteSimilar(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	return ui.renderEntries(g, filteredContents, nil)
+}
+
+func (ui *UI) sessionInfo(g *gocui.Gui, v *gocui.View) error {
+	topViewManager := ui.viewManagers[len(ui.viewManagers)-1]
+	entry := topViewManager.SelectedEntry()
+	entries := topViewManager.Contents()
+	sessionDuration := entries.SessionDuration(entry.Data.Session)
+	message := fmt.Sprintf("Session duration: %s", sessionDuration.String())
+
+	title := fmt.Sprintf("Session info: [%s]", entry.Data.Session)
+	view := NewPopupView(g, title, message)
+
+	maxX, maxY := g.Size()
+	totalX := (maxX - 1) / 2
+	totalY := (maxY - 1) / 3
+	startX := (maxX - totalX) / 2
+	startY := (maxY - totalY) / 2
+	_, err := view.View(startX, startY, startX+totalX, startY+totalY)
+	if err != nil {
+		return err
+	}
+
+	if err := setKeysbindings(ui.gui, view.Name(), navigateZoomOutKeys, gocui.ModNone, ui.zoomOut); err != nil {
+		return err
+	}
+
+	ui.viewManagers = append(ui.viewManagers, view)
+	return view.SetCurrent()
+	return nil
 }

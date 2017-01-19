@@ -1,6 +1,8 @@
 package parser_test
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/lager/chug"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,6 +32,28 @@ var _ = Describe("Entries", func() {
 
 			Expect(filteredEntries[0].Data.Message).To(Equal("1"))
 			Expect(filteredEntries[1].Data.Message).To(Equal("3"))
+		})
+	})
+
+	Describe("SessionDuration", func() {
+		BeforeEach(func() {
+			timeNow := time.Now()
+			entries = parser.Entries{
+				&parser.Entry{Data: chug.LogEntry{Session: "2", Timestamp: timeNow.Add(-5 * time.Minute)}},
+				&parser.Entry{Data: chug.LogEntry{Session: "1", Timestamp: timeNow.Add(-2 * time.Minute)}},
+				&parser.Entry{Data: chug.LogEntry{Session: "2", Timestamp: timeNow}},
+				&parser.Entry{Data: chug.LogEntry{Session: "3", Timestamp: timeNow.Add(10 * time.Second)}},
+			}
+		})
+
+		It("returns the time difference between first and last entries of a session", func() {
+			Expect(entries.SessionDuration("2")).To(Equal(5 * time.Minute))
+		})
+
+		Context("when the session has only one entry", func() {
+			It("returns 0", func() {
+				Expect(entries.SessionDuration("1")).To(BeZero())
+			})
 		})
 	})
 

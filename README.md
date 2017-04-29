@@ -26,7 +26,7 @@
 * `backspace` zooms out from the selected entry
 * `e` filters for errored logs only (`q` to zoom out)
 * `D` filters out similar log entries (those that the message matches exactly the one under the cursor)
-* `i` open current selected entry's session information popup
+* `i` toggle current selected entry's session information popup
 
 ## Demo
 

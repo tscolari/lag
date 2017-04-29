@@ -182,6 +182,10 @@ func (ui *UI) sessionInfo(g *gocui.Gui, v *gocui.View) error {
 		return err
 	}
 
+	if err := g.SetKeybinding(view.Name(), 'i', gocui.ModNone, ui.zoomOut); err != nil {
+		return err
+	}
+
 	ui.viewManagers = append(ui.viewManagers, view)
 	return view.SetCurrent()
 	return nil
